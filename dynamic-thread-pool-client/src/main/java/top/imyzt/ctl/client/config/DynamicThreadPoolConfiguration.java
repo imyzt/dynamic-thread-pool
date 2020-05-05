@@ -6,7 +6,9 @@ import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import top.imyzt.ctl.client.core.executor.DynamicThreadPoolTaskExecutor;
 import top.imyzt.ctl.common.pojo.dto.PoolConfigDTO;
@@ -27,6 +29,8 @@ public class DynamicThreadPoolConfiguration {
     private static final Logger log = LoggerFactory.getLogger(DynamicThreadPoolConfiguration.class);
     private final ApplicationContext applicationContext;
 
+    @Value("${spring.application.name}")
+    private String appName;
     @Value("${spring.dynamic.server-url}")
     private String serverUrl;
 
@@ -58,36 +62,39 @@ public class DynamicThreadPoolConfiguration {
     /**
      * 配置信息上报
      */
-    @PostConstruct
-    public void configReport() {
+    @Bean
+    ApplicationRunner configReport() {
 
-        ArrayList<PoolConfigDTO> poolConfigList = new ArrayList<>();
+        return (args) -> {
+            ArrayList<PoolConfigDTO> poolConfigList = new ArrayList<>();
 
-        dynamicThreadPoolTaskExecutorMap.forEach((tName, executor) -> {
+            dynamicThreadPoolTaskExecutorMap.forEach((tName, executor) -> {
 
-            ThreadPoolExecutor threadPoolExecutor = executor.getThreadPoolExecutor();
+                ThreadPoolExecutor threadPoolExecutor = executor.getThreadPoolExecutor();
 
-            PoolConfigDTO config = new PoolConfigDTO();
+                PoolConfigDTO config = new PoolConfigDTO();
 
-            config.setCorePoolSize(executor.getCorePoolSize());
-            config.setMaximumPoolSize(executor.getMaxPoolSize());
-            config.setPoolName(tName);
-            config.setQueueCapacity(executor.getKeepAliveSeconds());
-            config.setKeepAliveSeconds(executor.getKeepAliveSeconds());
+                config.setAppName(appName);
+                config.setCorePoolSize(executor.getCorePoolSize());
+                config.setMaximumPoolSize(executor.getMaxPoolSize());
+                config.setPoolName(tName);
+//                config.setQueueCapacity(executor.getQueueCapacity());
+                config.setKeepAliveSeconds(executor.getKeepAliveSeconds());
 
-            config.setQueueType(threadPoolExecutor.getQueue().getClass().getSimpleName());
+                config.setQueueType(threadPoolExecutor.getQueue().getClass().getSimpleName());
 
-            poolConfigList.add(config);
+                poolConfigList.add(config);
 
-        });
+            });
 
-        HttpResponse response = HttpRequest.post(serverUrl + "/config/init")
-                .body(JSON.toJSONString(poolConfigList))
-                .contentType("application/json")
-                .execute();
+            HttpResponse response = HttpRequest.post(serverUrl + "/config/init")
+                    .body(JSON.toJSONString(poolConfigList))
+                    .contentType("application/json")
+                    .execute();
 
-        String currNewVersion = response.body();
+            String currNewVersion = response.body();
 
-        log.info("初始化信息上报完成, 服务器端返回最新版本={}", currNewVersion);
+            log.info("初始化信息上报完成, 服务器端返回最新版本={}", currNewVersion);
+        };
     }
 }

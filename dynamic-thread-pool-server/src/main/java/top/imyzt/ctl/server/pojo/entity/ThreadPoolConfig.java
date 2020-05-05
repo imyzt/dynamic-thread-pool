@@ -1,14 +1,16 @@
-package top.imyzt.ctl.common.pojo.dto;
+package top.imyzt.ctl.server.pojo.entity;
 
 import lombok.Data;
 
 /**
  * @author imyzt
  * @date 2020/05/05
- * @description 线程池配置
+ * @description 线程池配置信息
  */
 @Data
-public class PoolConfigDTO {
+public class ThreadPoolConfig {
+
+
 
     private String appName;
 
@@ -23,5 +25,4 @@ public class PoolConfigDTO {
     private Integer queueCapacity;
 
     private Integer keepAliveSeconds;
-
 }
