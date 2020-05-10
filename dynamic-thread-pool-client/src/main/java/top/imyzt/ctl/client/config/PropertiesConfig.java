@@ -2,7 +2,7 @@ package top.imyzt.ctl.client.config;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import top.imyzt.ctl.client.properties.ClientProperties;
+import top.imyzt.ctl.client.properties.DynamicThreadPoolProperties;
 
 /**
  * @author imyzt
@@ -11,7 +11,7 @@ import top.imyzt.ctl.client.properties.ClientProperties;
  */
 @Configuration
 @EnableConfigurationProperties(value = {
-        ClientProperties.class
+        DynamicThreadPoolProperties.class
 })
 public class PropertiesConfig {
 }

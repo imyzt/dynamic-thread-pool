@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import top.imyzt.ctl.client.collection.ScheduledReport;
-import top.imyzt.ctl.client.properties.ClientProperties;
+import top.imyzt.ctl.client.properties.DynamicThreadPoolProperties;
 
 /**
  * @author imyzt
@@ -19,12 +19,12 @@ import top.imyzt.ctl.client.properties.ClientProperties;
 @EnableScheduling
 public class CompleteScheduleConfig implements SchedulingConfigurer {
 
-    private final ClientProperties clientProperties;
+    private final DynamicThreadPoolProperties dynamicThreadPoolProperties;
     private final ScheduledReport scheduledReport;
 
-    public CompleteScheduleConfig(ClientProperties clientProperties,
+    public CompleteScheduleConfig(DynamicThreadPoolProperties dynamicThreadPoolProperties,
                                   ScheduledReport scheduledReport) {
-        this.clientProperties = clientProperties;
+        this.dynamicThreadPoolProperties = dynamicThreadPoolProperties;
         this.scheduledReport = scheduledReport;
     }
 
@@ -36,7 +36,7 @@ public class CompleteScheduleConfig implements SchedulingConfigurer {
                 scheduledReport::collection,
                 //2.设置执行周期(Trigger)
                 triggerContext -> {
-                    long cycleMilliSeconds = clientProperties.getCycle().toMillis();
+                    long cycleMilliSeconds = dynamicThreadPoolProperties.getCycle().toMillis();
                     return new PeriodicTrigger(cycleMilliSeconds).nextExecutionTime(triggerContext);
                 }
         );

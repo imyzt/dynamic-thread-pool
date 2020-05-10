@@ -1,5 +1,6 @@
 package top.imyzt.ctl.server.service;
 
+import org.springframework.web.context.request.async.DeferredResult;
 import top.imyzt.ctl.common.pojo.dto.PoolConfigDTO;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface ConfigService {
      * @param dtoList 配置列表
      */
     void saveClientConfig(List<PoolConfigDTO> dtoList);
+
+    DeferredResult<Object> configChanceMonitor(String appName);
 }

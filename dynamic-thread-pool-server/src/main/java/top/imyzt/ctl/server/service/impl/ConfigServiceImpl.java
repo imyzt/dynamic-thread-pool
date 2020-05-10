@@ -6,7 +6,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.async.DeferredResult;
 import top.imyzt.ctl.common.pojo.dto.PoolConfigDTO;
 import top.imyzt.ctl.server.pojo.entity.ThreadPoolConfig;
 import top.imyzt.ctl.server.service.ConfigService;
@@ -25,6 +27,9 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Resource
     private MongoTemplate mongoTemplate;
+    @Resource(name = "threadPoolConfigChanceMonitor")
+    private ThreadPoolTaskExecutor threadPoolConfigChanceMonitor;
+
 
     @Override
     public void saveClientConfig(List<PoolConfigDTO> dtoList) {
@@ -44,5 +49,32 @@ public class ConfigServiceImpl implements ConfigService {
 
         }
 
+    }
+
+    @Override
+    public DeferredResult<Object> configChanceMonitor(String appName) {
+        DeferredResult<Object> response = new DeferredResult<>(
+                // 请求的超时时间(10秒)
+                10000L,
+                // 超时后响应的结果
+                "retry");
+
+        /*response.onCompletion(() -> {
+            // 请求处理完成后所做的一些工作
+        });*/
+
+        threadPoolConfigChanceMonitor.execute(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // 调用此方法时立即向浏览器发出响应；未调用时请求被挂起
+            response.setResult(new Object());
+            log.info("返回给用户消息");
+        });
+
+
+        return response;
     }
 }

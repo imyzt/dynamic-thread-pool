@@ -14,15 +14,16 @@ import top.imyzt.ctl.client.core.executor.DynamicThreadPoolTaskExecutor;
 @Slf4j
 public class WorkerThreadPoolConfig {
 
+    /**
+     * 采集上报线程池
+     */
     @Bean
     public DynamicThreadPoolTaskExecutor collectionThreadPool() {
-
         DynamicThreadPoolTaskExecutor executor = new DynamicThreadPoolTaskExecutor();
         executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(3);
-        executor.setQueueCapacity(100);
+        executor.setMaxPoolSize(1);
+        executor.setQueueCapacity(16);
         executor.setThreadNamePrefix("thread-pool-collection-");
-
         return executor;
     }
 }

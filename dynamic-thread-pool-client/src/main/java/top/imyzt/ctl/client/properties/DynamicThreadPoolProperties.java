@@ -9,12 +9,12 @@ import java.time.Duration;
 /**
  * @author imyzt
  * @date 2020/05/04
- * @description 客户端配置
+ * @description 动态线程池配置
  */
 @Validated
-@ConfigurationProperties(prefix = "spring.dynamic")
+@ConfigurationProperties(prefix = "spring.dynamic-thread-pool")
 @Data
-public class ClientProperties {
+public class DynamicThreadPoolProperties {
 
     /**
      * 服务器上报地址
