@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import top.imyzt.ctl.common.pojo.dto.PoolConfigDTO;
+import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
 import top.imyzt.ctl.server.service.ConfigService;
 
 import javax.annotation.Resource;
@@ -35,7 +36,7 @@ public class ConfigController {
      */
 
     @PostMapping("/init")
-    public String initConfig(@RequestBody List<PoolConfigDTO> dto) throws JsonProcessingException {
+    public String initConfig(@RequestBody ThreadPoolConfigReportBaseInfo dto) throws JsonProcessingException {
 
         log.info("收到初始化上报配置信息, {}", objectMapper.writeValueAsString(dto));
 

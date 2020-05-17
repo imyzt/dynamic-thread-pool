@@ -13,15 +13,8 @@ import java.util.concurrent.SynchronousQueue;
  */
 public class DynamicThreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
 
-    private int queueCapacity;
-
-    public int getQueueCapacity() {
-        return queueCapacity;
-    }
-
     @Override
     protected BlockingQueue<Runnable> createQueue(int queueCapacity) {
-        this.queueCapacity = queueCapacity;
         if (queueCapacity > 0) {
             return new ResizeCapacityLinkedBlockingQueue<>(queueCapacity);
         }

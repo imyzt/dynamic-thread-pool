@@ -9,7 +9,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.async.DeferredResult;
-import top.imyzt.ctl.common.pojo.dto.PoolConfigDTO;
+import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
+import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
 import top.imyzt.ctl.server.pojo.entity.ThreadPoolConfig;
 import top.imyzt.ctl.server.service.ConfigService;
 
@@ -27,16 +28,20 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Resource
     private MongoTemplate mongoTemplate;
-    @Resource(name = "threadPoolConfigChanceMonitor")
-    private ThreadPoolTaskExecutor threadPoolConfigChanceMonitor;
+    @Resource(name = "threadPoolConfigChangeMonitor")
+    private ThreadPoolTaskExecutor threadPoolConfigChangeMonitor;
 
 
     @Override
-    public void saveClientConfig(List<PoolConfigDTO> dtoList) {
+    public void saveClientConfig(ThreadPoolConfigReportBaseInfo threadPoolConfigReportBaseInfo) {
 
-        for (PoolConfigDTO dto : dtoList) {
+        String appName = threadPoolConfigReportBaseInfo.getAppName();
 
-            Criteria criteria = Criteria.where("appName").is(dto.getAppName())
+        List<ThreadPoolBaseInfo> threadPoolInfo = threadPoolConfigReportBaseInfo.getThreadPoolInfo();
+
+        for (ThreadPoolBaseInfo dto : threadPoolInfo) {
+
+            Criteria criteria = Criteria.where("appName").is(appName)
                     .and("poolName").is(dto.getPoolName());
             Update update = new Update().set("corePoolSize", dto.getCorePoolSize())
                     .set("maximumPoolSize", dto.getMaximumPoolSize())
@@ -52,7 +57,7 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
-    public DeferredResult<Object> configChanceMonitor(String appName) {
+    public DeferredResult<Object>   configChanceMonitor(String appName) {
         DeferredResult<Object> response = new DeferredResult<>(
                 // 请求的超时时间(10秒)
                 10000L,
@@ -63,7 +68,7 @@ public class ConfigServiceImpl implements ConfigService {
             // 请求处理完成后所做的一些工作
         });*/
 
-        threadPoolConfigChanceMonitor.execute(() -> {
+        threadPoolConfigChangeMonitor.execute(() -> {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

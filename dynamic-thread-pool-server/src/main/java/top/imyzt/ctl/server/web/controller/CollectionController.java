@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import top.imyzt.ctl.common.pojo.dto.DynamicThreadPoolReportDTO;
+import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
 
 import javax.annotation.Resource;
 
@@ -24,7 +24,7 @@ public class CollectionController {
     private MongoTemplate mongoTemplate;
 
     @PostMapping
-    public String collection (@RequestBody DynamicThreadPoolReportDTO dto) {
+    public String collection (@RequestBody ThreadPoolConfigReportBaseInfo dto) {
 
         log.info("收到采集上报数据, {}", dto.toString());
 

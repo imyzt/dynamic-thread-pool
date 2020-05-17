@@ -2,6 +2,8 @@ package top.imyzt.ctl.common.pojo.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author imyzt
  * @date 2020/05/05
@@ -12,16 +14,6 @@ public class PoolConfigDTO {
 
     private String appName;
 
-    private String poolName;
-
-    private Integer corePoolSize;
-
-    private Integer maximumPoolSize;
-
-    private String queueType;
-
-    private Integer queueCapacity;
-
-    private Integer keepAliveSeconds;
+    private List<ThreadPoolBaseInfo> threadPoolConfigList;
 
 }

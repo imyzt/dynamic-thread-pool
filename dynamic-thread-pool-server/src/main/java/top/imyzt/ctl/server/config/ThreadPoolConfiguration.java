@@ -17,7 +17,7 @@ public class ThreadPoolConfiguration {
     /**
      * 服务端监听线程池改变时, 响应客户端长连接的池
      */
-    @Bean("threadPoolConfigChanceMonitor")
+    @Bean("threadPoolConfigChangeMonitor")
     public ThreadPoolTaskExecutor threadPoolConfigChanceMonitor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(20);

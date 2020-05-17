@@ -1,4 +1,4 @@
-package top.imyzt.ctl.client.config;
+package top.imyzt.ctl.client.config.properties;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

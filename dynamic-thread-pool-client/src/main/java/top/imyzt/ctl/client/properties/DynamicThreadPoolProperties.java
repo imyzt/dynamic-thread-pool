@@ -24,7 +24,7 @@ public class DynamicThreadPoolProperties {
     /**
      * 数据上报周期
      */
-    private Duration cycle = Duration.ofSeconds(3000);
+    private Duration cycle = Duration.ofSeconds(3);
 
 
 }

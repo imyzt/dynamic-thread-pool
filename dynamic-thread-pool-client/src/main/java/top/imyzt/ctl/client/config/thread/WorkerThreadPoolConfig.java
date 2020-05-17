@@ -1,4 +1,4 @@
-package top.imyzt.ctl.client.config;
+package top.imyzt.ctl.client.config.thread;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
