@@ -34,6 +34,9 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public void saveClientConfig(ThreadPoolConfigReportBaseInfo config) {
 
+        // TODO 可优化
+        // 将对象MD5之后, 将config对象增加存储version字段, 值为MD5, 同一个应用程序不同实例,每次上报时将内容md5, 对比数据库md5, 避免多次存储数据库相同数据
+
         String appName = config.getAppName();
 
         config.getThreadPoolConfigList()
@@ -73,6 +76,15 @@ public class ConfigServiceImpl implements ConfigService {
                 .and("poolName").is(poolName);
 
         return mongoTemplate.findOne(new Query(criteria), ThreadPoolBaseInfo.class);
+    }
+
+    @Override
+    public void saveThreadPoolWorkerState(ThreadPoolConfigReportBaseInfo dto) {
+
+        // 保存工作状态
+        mongoTemplate.save(dto);
+
+        log.info("收到采集上报数据, appName={}, {}", dto.getAppName(), JsonUtils.toJson(dto));
     }
 
     private void saveOrUpdateThreadPoolConfig(String appName, ThreadPoolBaseInfo threadPoolConfig) {

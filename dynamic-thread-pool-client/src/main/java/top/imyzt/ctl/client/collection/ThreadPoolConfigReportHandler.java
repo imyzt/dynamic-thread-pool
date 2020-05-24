@@ -10,6 +10,7 @@ import top.imyzt.ctl.client.config.thread.DynamicThreadPoolConfiguration;
 import top.imyzt.ctl.client.core.executor.DynamicThreadPoolTaskExecutor;
 import top.imyzt.ctl.client.core.queue.ResizeCapacityLinkedBlockingQueue;
 import top.imyzt.ctl.client.utils.ThreadPoolUtils;
+import top.imyzt.ctl.common.constants.ServerEndpoint;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportInfo;
@@ -47,7 +48,7 @@ public class ThreadPoolConfigReportHandler {
     }
 
     /**
-     * 定时采集数据上报
+     * 定时上报线程池工作状态数据
      */
     public void scheduleReport() {
 
@@ -61,14 +62,13 @@ public class ThreadPoolConfigReportHandler {
         dto.setThreadPoolConfigList(threadPoolWorkStateList);
 
         // 数据上报
-
-        String currNewVersion = sendToServer(dto);
+        String currNewVersion = this.sendToServer(dto, ServerEndpoint.WORKER_STATE);
 
         log.info("定时上报任务上报完成, 服务器端返回最新版本={}", currNewVersion);
     }
 
     /**
-     * 初始上报
+     * 初始上报线程池配置信息
      */
     public void initialReport() {
 
@@ -89,7 +89,7 @@ public class ThreadPoolConfigReportHandler {
 
         ThreadPoolConfigReportBaseInfo dto = new ThreadPoolConfigReportBaseInfo(appName, threadPoolConfigList);
 
-        String currNewVersion = sendToServer(dto);
+        String currNewVersion = sendToServer(dto, ServerEndpoint.INIT);
 
         log.info("初始化信息上报完成, 服务器端返回最新版本={}", currNewVersion);
     }
@@ -98,8 +98,8 @@ public class ThreadPoolConfigReportHandler {
      * 发送信息到服务端
      * @return 服务端最新版本
      */
-    private String sendToServer(ThreadPoolConfigReportBaseInfo dto) {
-        HttpResponse response = HttpRequest.post(serverUrl + "/config/init")
+    private String sendToServer(ThreadPoolConfigReportBaseInfo dto, String path) {
+        HttpResponse response = HttpRequest.post(serverUrl + path)
                 .body(JSON.toJSONString(dto))
                 .contentType("application/json")
                 .execute();

@@ -1,0 +1,6 @@
+spring:
+  dynamic-thread-pool:
+    server-url: "http://localhost:9876"
+    cycle: 3s
+  application:
+    name: "client-example"

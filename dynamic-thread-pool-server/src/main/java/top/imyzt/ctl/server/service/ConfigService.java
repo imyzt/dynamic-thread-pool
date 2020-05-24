@@ -39,4 +39,10 @@ public interface ConfigService {
      * @return 最新配置信息
      */
     ThreadPoolBaseInfo getNewConfig(String appName, String poolName);
+
+    /**
+     * 保存线程池的工作状态信息
+     * @param dto 线程池工作状态
+     */
+    void saveThreadPoolWorkerState(ThreadPoolConfigReportBaseInfo dto);
 }

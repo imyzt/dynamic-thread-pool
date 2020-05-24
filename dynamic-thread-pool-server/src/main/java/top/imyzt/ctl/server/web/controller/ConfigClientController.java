@@ -1,8 +1,7 @@
 package top.imyzt.ctl.server.web.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -13,6 +12,8 @@ import top.imyzt.ctl.server.service.ConfigService;
 import javax.annotation.Resource;
 import javax.validation.constraints.NotBlank;
 
+import static top.imyzt.ctl.common.constants.ServerEndpoint.*;
+
 /**
  * @author imyzt
  * @date 2020/05/05
@@ -20,13 +21,14 @@ import javax.validation.constraints.NotBlank;
  */
 @Slf4j
 @RestController
-@RequestMapping("config/client")
+@RequestMapping(CONFIG_CLIENT)
 @CrossOrigin("*")
 public class ConfigClientController {
 
-
     @Resource
     private ConfigService configService;
+    @Resource
+    private MongoTemplate mongoTemplate;
 
     /**
      * 1. 获取最新的线程配置
@@ -35,12 +37,19 @@ public class ConfigClientController {
      * 3. 维护长连接, 通知客户端配置更新
      */
 
-    @PostMapping("/init")
-    public String initConfig(@Validated @RequestBody ThreadPoolConfigReportBaseInfo dto) throws JsonProcessingException {
+    @PostMapping(INIT)
+    public void initConfig(@Validated @RequestBody ThreadPoolConfigReportBaseInfo dto) {
 
         configService.saveClientConfig(dto);
+    }
 
-        return "1";
+    /**
+     * 采集定时上报线程池的工作状态信息
+     */
+    @PostMapping(WORKER_STATE)
+    public void workerState (@RequestBody ThreadPoolConfigReportBaseInfo dto) {
+
+        configService.saveThreadPoolWorkerState(dto);
     }
 
     /**
@@ -48,7 +57,7 @@ public class ConfigClientController {
      *
      * 理论上一个应用实例只需要监听一次就行, 后续在界面上更新配置时, 更新了哪一个线程池也能定位到是哪一个的应用
      */
-    @GetMapping("/watch/{appName}")
+    @GetMapping(WATCH)
     public DeferredResult<String> chanceMonitor(@Validated @PathVariable @NotBlank(message = "接入名称不可为空") String appName) {
 
         return configService.configChanceMonitor(appName);
@@ -57,7 +66,7 @@ public class ConfigClientController {
     /**
      * 获取最新配置
      */
-    @GetMapping("/getNewConfig/{appName}/{poolName}")
+    @GetMapping(GET_NEW_CONFIG)
     public ThreadPoolBaseInfo getNewConfig(@PathVariable String appName, @PathVariable String poolName) {
 
         return configService.getNewConfig(appName, poolName);
