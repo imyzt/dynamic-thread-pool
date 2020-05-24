@@ -1,7 +1,8 @@
-package top.imyzt.ctl.client.collection;
+package top.imyzt.ctl.client.handler;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpStatus;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +25,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static java.net.InetAddress.getLocalHost;
+import static top.imyzt.ctl.common.constants.ServerEndpoint.GET_NEW_CONFIG;
+import static top.imyzt.ctl.common.constants.ServerEndpoint.WATCH;
 
 /**
  * @author imyzt
@@ -50,7 +53,7 @@ public class ThreadPoolConfigReportHandler {
     /**
      * 定时上报线程池工作状态数据
      */
-    public void scheduleReport() {
+    public void timingReport() {
 
         Map<String, DynamicThreadPoolTaskExecutor> dynamicThreadPoolMap =
                 dynamicThreadPoolConfiguration.getDynamicThreadPoolTaskExecutorMap();
@@ -178,5 +181,41 @@ public class ThreadPoolConfigReportHandler {
             int capacity = ((ResizeCapacityLinkedBlockingQueue) threadPoolExecutor.getQueue()).getCapacity();
             dto.setQueueCapacity(capacity);
         }
+    }
+
+    /**
+     * 配置改变监听, 如果改变, 修改配置
+     */
+    public void configChangeMonitor() {
+
+        // 长连接获取配置更新
+        String poolName = this.monitor();
+
+        // 请求线程配置
+        HttpResponse response = HttpRequest.get(serverUrl + GET_NEW_CONFIG)
+                .form("appName", appName)
+                .form("poolName", poolName)
+                .execute();
+        String json = response.body();
+
+        // 修改配置
+        ThreadPoolUtils.editThreadPoolStatus(JSON.parseObject(json, ThreadPoolBaseInfo.class));
+
+    }
+
+    /**
+     * 长连接获取配置更新
+     */
+    private String monitor() {
+
+        HttpResponse response = HttpRequest.get(serverUrl + WATCH).execute();
+
+        int status = response.getStatus();
+
+        if (HttpStatus.HTTP_NOT_MODIFIED == status) {
+            this.monitor();
+        }
+
+        return response.body();
     }
 }

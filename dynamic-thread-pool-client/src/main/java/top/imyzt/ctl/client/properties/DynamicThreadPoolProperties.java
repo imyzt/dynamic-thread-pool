@@ -4,8 +4,6 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.Duration;
-
 /**
  * @author imyzt
  * @date 2020/05/04
@@ -23,8 +21,8 @@ public class DynamicThreadPoolProperties {
 
     /**
      * 数据上报周期
+     * 单位=毫秒
      */
-    private Duration cycle = Duration.ofSeconds(3);
-
+    private long fixedRate = 2000;
 
 }
