@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -24,6 +25,7 @@ public class ThreadPoolConfigReportBaseInfo {
     /**
      * 线程池信息
      */
-    private List<ThreadPoolBaseInfo> threadPoolInfo;
+    @NotNull(message = "线程池配置信息不能为空")
+    private List<ThreadPoolBaseInfo> threadPoolConfigList;
 
 }

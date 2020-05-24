@@ -58,7 +58,7 @@ public class ThreadPoolConfigReportHandler {
 
         List<ThreadPoolBaseInfo> threadPoolWorkStateList = buildThreadPoolWorkStateList(dynamicThreadPoolMap);
 
-        dto.setThreadPoolInfo(threadPoolWorkStateList);
+        dto.setThreadPoolConfigList(threadPoolWorkStateList);
 
         // 数据上报
 

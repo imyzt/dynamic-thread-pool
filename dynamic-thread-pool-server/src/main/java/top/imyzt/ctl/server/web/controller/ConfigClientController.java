@@ -3,28 +3,28 @@ package top.imyzt.ctl.server.web.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
-import top.imyzt.ctl.common.pojo.dto.PoolConfigDTO;
+import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
 import top.imyzt.ctl.server.service.ConfigService;
 
 import javax.annotation.Resource;
-import java.util.List;
+import javax.validation.constraints.NotBlank;
 
 /**
  * @author imyzt
  * @date 2020/05/05
- * @description 获取最新配置信息
+ * @description 客户端 获取/上报 配置信息
  */
 @Slf4j
 @RestController
-@RequestMapping("config")
+@RequestMapping("config/client")
 @CrossOrigin("*")
-public class ConfigController {
+public class ConfigClientController {
 
-    @Resource
-    private ObjectMapper objectMapper;
+
     @Resource
     private ConfigService configService;
 
@@ -36,9 +36,7 @@ public class ConfigController {
      */
 
     @PostMapping("/init")
-    public String initConfig(@RequestBody ThreadPoolConfigReportBaseInfo dto) throws JsonProcessingException {
-
-        log.info("收到初始化上报配置信息, {}", objectMapper.writeValueAsString(dto));
+    public String initConfig(@Validated @RequestBody ThreadPoolConfigReportBaseInfo dto) throws JsonProcessingException {
 
         configService.saveClientConfig(dto);
 
@@ -50,12 +48,19 @@ public class ConfigController {
      *
      * 理论上一个应用实例只需要监听一次就行, 后续在界面上更新配置时, 更新了哪一个线程池也能定位到是哪一个的应用
      */
-    @GetMapping("/chance_monitor")
-    public DeferredResult<Object> chanceMonitor(String appName) {
-
-
+    @GetMapping("/watch/{appName}")
+    public DeferredResult<String> chanceMonitor(@Validated @PathVariable @NotBlank(message = "接入名称不可为空") String appName) {
 
         return configService.configChanceMonitor(appName);
+    }
+
+    /**
+     * 获取最新配置
+     */
+    @GetMapping("/getNewConfig/{appName}/{poolName}")
+    public ThreadPoolBaseInfo getNewConfig(@PathVariable String appName, @PathVariable String poolName) {
+
+        return configService.getNewConfig(appName, poolName);
     }
 
 

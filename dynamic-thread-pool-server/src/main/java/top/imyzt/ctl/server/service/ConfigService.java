@@ -1,10 +1,8 @@
 package top.imyzt.ctl.server.service;
 
 import org.springframework.web.context.request.async.DeferredResult;
-import top.imyzt.ctl.common.pojo.dto.PoolConfigDTO;
+import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
-
-import java.util.List;
 
 /**
  * @author imyzt
@@ -19,5 +17,26 @@ public interface ConfigService {
      */
     void saveClientConfig(ThreadPoolConfigReportBaseInfo threadPoolConfigReportBaseInfo);
 
-    DeferredResult<Object> configChanceMonitor(String appName);
+    /**
+     * 客户端发起监听, 60s长连接, 期间无配置更新返回304, 有配置更新立即端口, 由客户端发起请求获取新配置
+     * @param appName 客户端实例名称
+     * @return  长连接对象
+     */
+    DeferredResult<String> configChanceMonitor(String appName);
+
+    /**
+     * 发布配置信息
+     * @param appName 客户端实例名称
+     * @param threadPoolConfig 新的线程配置信息
+     * @return
+     */
+    void publishConfig(String appName, ThreadPoolBaseInfo threadPoolConfig);
+
+    /**
+     * 获取对应线程池最新配置
+     * @param appName 客户端实例名称
+     * @param poolName 线程池名称
+     * @return 最新配置信息
+     */
+    ThreadPoolBaseInfo getNewConfig(String appName, String poolName);
 }
