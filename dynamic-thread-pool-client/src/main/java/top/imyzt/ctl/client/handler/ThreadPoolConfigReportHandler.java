@@ -1,15 +1,18 @@
 package top.imyzt.ctl.client.handler;
 
+import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpStatus;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import top.imyzt.ctl.client.config.thread.DynamicThreadPoolConfiguration;
 import top.imyzt.ctl.client.core.executor.DynamicThreadPoolTaskExecutor;
 import top.imyzt.ctl.client.core.queue.ResizeCapacityLinkedBlockingQueue;
+import top.imyzt.ctl.client.utils.HttpUtils;
 import top.imyzt.ctl.client.utils.ThreadPoolUtils;
 import top.imyzt.ctl.common.constants.ServerEndpoint;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
@@ -19,6 +22,7 @@ import top.imyzt.ctl.common.pojo.dto.ThreadPoolWorkState;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -92,7 +96,7 @@ public class ThreadPoolConfigReportHandler {
 
         ThreadPoolConfigReportBaseInfo dto = new ThreadPoolConfigReportBaseInfo(appName, threadPoolConfigList);
 
-        String currNewVersion = sendToServer(dto, ServerEndpoint.INIT);
+        String currNewVersion = this.sendToServer(dto, ServerEndpoint.INIT);
 
         log.info("初始化信息上报完成, 服务器端返回最新版本={}", currNewVersion);
     }
@@ -102,11 +106,15 @@ public class ThreadPoolConfigReportHandler {
      * @return 服务端最新版本
      */
     private String sendToServer(ThreadPoolConfigReportBaseInfo dto, String path) {
-        HttpResponse response = HttpRequest.post(serverUrl + path)
-                .body(JSON.toJSONString(dto))
-                .contentType("application/json")
-                .execute();
-        return response.body();
+        try {
+            return HttpRequest.post(serverUrl + path)
+                    .body(JSON.toJSONString(dto))
+                    .contentType("application/json")
+                    .execute().body();
+        } catch (HttpException e) {
+            log.error("服务端程序返回异常", e);
+            return null;
+        }
     }
 
 
@@ -192,15 +200,13 @@ public class ThreadPoolConfigReportHandler {
         String poolName = this.monitor();
 
         // 请求线程配置
-        HttpResponse response = HttpRequest.get(serverUrl + GET_NEW_CONFIG)
-                .form("appName", appName)
-                .form("poolName", poolName)
-                .execute();
-        String json = response.body();
+        HashMap<String, String> param = Maps.newHashMap();
+        param.put("appName", appName);
+        param.put("poolName", poolName);
+        ThreadPoolBaseInfo info = HttpUtils.getRestData(serverUrl + GET_NEW_CONFIG, param);
 
         // 修改配置
-        ThreadPoolUtils.editThreadPoolStatus(JSON.parseObject(json, ThreadPoolBaseInfo.class));
-
+        ThreadPoolUtils.editThreadPoolStatus(info);
     }
 
     /**
@@ -208,7 +214,9 @@ public class ThreadPoolConfigReportHandler {
      */
     private String monitor() {
 
-        HttpResponse response = HttpRequest.get(serverUrl + WATCH).execute();
+        HashMap<String, String> param = Maps.newHashMap();
+        param.put("appName", appName);
+        HttpResponse response = HttpUtils.sendRestGet(serverUrl + WATCH, param);
 
         int status = response.getStatus();
 

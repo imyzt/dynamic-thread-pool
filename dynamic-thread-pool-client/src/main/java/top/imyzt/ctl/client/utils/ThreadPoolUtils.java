@@ -1,6 +1,5 @@
 package top.imyzt.ctl.client.utils;
 
-import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -8,6 +7,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolWorkState;
+import top.imyzt.ctl.common.utils.JsonUtils;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -64,7 +64,7 @@ public class ThreadPoolUtils {
         nonNullCheck(newConfig::getQueueCapacity, taskExecutor::setQueueCapacity);
         nonNullCheck(newConfig::getKeepAliveSeconds, taskExecutor::setKeepAliveSeconds);
         nonNullCheck(newConfig::getThreadNamePrefix, taskExecutor::setThreadNamePrefix);
-        log.info("线程池{}调整成功, 新配置={}", newConfig.getPoolName(), JSON.toJSONString(newConfig));
+        log.info("线程池{}调整成功, 新配置={}", newConfig.getPoolName(), JsonUtils.toJsonString(newConfig));
     }
 
     private static <T> void nonNullCheck(Supplier<T> get, Consumer<T> set) {

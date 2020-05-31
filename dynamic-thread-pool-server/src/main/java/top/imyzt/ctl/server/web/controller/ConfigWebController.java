@@ -32,7 +32,9 @@ public class ConfigWebController {
     @PostMapping("publishConfig/{appName}")
     public String publishConfig(@PathVariable String appName, ThreadPoolBaseInfo threadPoolConfig) {
 
-        return configService.publishConfig(appName, threadPoolConfig);
+        configService.publishConfig(appName, threadPoolConfig);
+
+        return "success";
     }
 
 }

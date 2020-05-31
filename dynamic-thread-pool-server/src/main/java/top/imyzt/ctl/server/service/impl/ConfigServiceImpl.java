@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.async.DeferredResult;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
+import top.imyzt.ctl.common.utils.JsonUtils;
 import top.imyzt.ctl.server.core.watch.ConfigChangeWatch;
 import top.imyzt.ctl.server.service.ConfigService;
-import top.imyzt.ctl.server.utils.JsonUtils;
 import top.imyzt.ctl.server.utils.RequestUtils;
 
 import javax.annotation.Resource;
@@ -42,7 +42,7 @@ public class ConfigServiceImpl implements ConfigService {
         config.getThreadPoolConfigList()
                 .forEach(threadPoolConfig -> this.saveOrUpdateThreadPoolConfig(appName, threadPoolConfig));
 
-        log.info("收到初始化上报配置信息, {}", JsonUtils.toJson(config));
+        log.info("收到初始化上报配置信息, {}", JsonUtils.toJsonString(config));
     }
 
     @Override
@@ -84,7 +84,7 @@ public class ConfigServiceImpl implements ConfigService {
         // 保存工作状态
         mongoTemplate.save(dto);
 
-        log.info("收到采集上报数据, appName={}, {}", dto.getAppName(), JsonUtils.toJson(dto));
+        log.info("收到采集上报数据, appName={}, {}", dto.getAppName(), top.imyzt.ctl.common.utils.JsonUtils.toJsonString(dto));
     }
 
     private void saveOrUpdateThreadPoolConfig(String appName, ThreadPoolBaseInfo threadPoolConfig) {

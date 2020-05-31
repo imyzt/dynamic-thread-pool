@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 @Slf4j
 @Configuration
 @EnableScheduling
-public class BootstrapSystem {
+public class BootstrapSystemStarter {
 
     @Resource
     private ThreadPoolConfigReportHandler threadPoolConfigReportHandler;
