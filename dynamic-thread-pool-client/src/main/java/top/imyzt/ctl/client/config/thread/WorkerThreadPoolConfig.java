@@ -26,4 +26,30 @@ public class WorkerThreadPoolConfig {
         executor.setThreadNamePrefix("thread-pool-collection-");
         return executor;
     }
+
+    /**
+     * 监听服务端线程池配置变化
+     */
+    @Bean
+    public DynamicThreadPoolTaskExecutor configChangeMonitor() {
+        DynamicThreadPoolTaskExecutor executor = new DynamicThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(1);
+        executor.setQueueCapacity(16);
+        executor.setThreadNamePrefix("config-change-monitor-");
+        return executor;
+    }
+
+    /**
+     * 修改线程池配置
+     */
+    @Bean
+    public DynamicThreadPoolTaskExecutor configChange() {
+        DynamicThreadPoolTaskExecutor executor = new DynamicThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(1);
+        executor.setQueueCapacity(16);
+        executor.setThreadNamePrefix("config-change-");
+        return executor;
+    }
 }

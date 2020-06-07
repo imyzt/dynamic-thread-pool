@@ -8,10 +8,13 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import top.imyzt.ctl.client.config.thread.DynamicThreadPoolConfiguration;
 import top.imyzt.ctl.client.core.executor.DynamicThreadPoolTaskExecutor;
 import top.imyzt.ctl.client.core.queue.ResizeCapacityLinkedBlockingQueue;
+import top.imyzt.ctl.client.listener.event.ThreadPoolConfigChangeEvent;
 import top.imyzt.ctl.client.utils.HttpUtils;
 import top.imyzt.ctl.client.utils.ThreadPoolUtils;
 import top.imyzt.ctl.common.constants.ServerEndpoint;
@@ -20,6 +23,7 @@ import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolWorkState;
 
+import javax.annotation.Resource;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +33,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static java.net.InetAddress.getLocalHost;
-import static top.imyzt.ctl.common.constants.ServerEndpoint.GET_NEW_CONFIG;
 import static top.imyzt.ctl.common.constants.ServerEndpoint.WATCH;
 
 /**
@@ -47,6 +50,8 @@ public class ThreadPoolConfigReportHandler {
     private Integer appPort;
     @Value("${spring.dynamic-thread-pool.server-url}")
     private String serverUrl;
+    @Resource
+    private ApplicationContext applicationContext;
 
     private final DynamicThreadPoolConfiguration dynamicThreadPoolConfiguration;
 
@@ -77,6 +82,7 @@ public class ThreadPoolConfigReportHandler {
     /**
      * 初始上报线程池配置信息
      */
+    @Async("collectionThreadPool")
     public void initialReport() {
 
         Map<String, DynamicThreadPoolTaskExecutor> dynamicThreadPoolTaskExecutorMap =
@@ -194,25 +200,8 @@ public class ThreadPoolConfigReportHandler {
     /**
      * 配置改变监听, 如果改变, 修改配置
      */
+    @Async("configChangeMonitor")
     public void configChangeMonitor() {
-
-        // 长连接获取配置更新
-        String poolName = this.monitor();
-
-        // 请求线程配置
-        HashMap<String, String> param = Maps.newHashMap();
-        param.put("appName", appName);
-        param.put("poolName", poolName);
-        ThreadPoolBaseInfo info = HttpUtils.getRestData(serverUrl + GET_NEW_CONFIG, param);
-
-        // 修改配置
-        ThreadPoolUtils.editThreadPoolStatus(info);
-    }
-
-    /**
-     * 长连接获取配置更新
-     */
-    private String monitor() {
 
         HashMap<String, String> param = Maps.newHashMap();
         param.put("appName", appName);
@@ -221,9 +210,13 @@ public class ThreadPoolConfigReportHandler {
         int status = response.getStatus();
 
         if (HttpStatus.HTTP_NOT_MODIFIED == status) {
-            this.monitor();
+            this.configChangeMonitor();
         }
 
-        return response.body();
+        // 交由监听器处理线程改变
+        applicationContext.publishEvent(new ThreadPoolConfigChangeEvent(this, response.body()));
+
+        this.configChangeMonitor();
     }
+
 }

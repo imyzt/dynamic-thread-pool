@@ -34,7 +34,7 @@ public class GuavaConfigChangeWatch implements ConfigChangeWatch {
             watchRequests.remove(appName, deferredResult);
         });
         watchRequests.put(appName, deferredResult);
-
+        log.info("watch key={}", appName);
         return deferredResult;
     }
 
