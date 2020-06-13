@@ -6,7 +6,7 @@
 
 # 设计
 
-![架构图](http://blog.imyzt.top/upload/2020/05/v9c4k50u7uhduqh0ptvq1c14d2.png)
+![架构图](http://blog.imyzt.top/upload/2020/06/rshg8a6buigc7rdvcdk9q193rj.png)
 
 # 实现
 
