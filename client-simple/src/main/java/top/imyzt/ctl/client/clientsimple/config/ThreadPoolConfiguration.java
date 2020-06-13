@@ -2,7 +2,7 @@ package top.imyzt.ctl.client.clientsimple.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import top.imyzt.ctl.client.core.executor.DynamicThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * @author imyzt
@@ -13,8 +13,8 @@ import top.imyzt.ctl.client.core.executor.DynamicThreadPoolTaskExecutor;
 public class ThreadPoolConfiguration {
 
     @Bean
-    public DynamicThreadPoolTaskExecutor printThread() {
-        DynamicThreadPoolTaskExecutor executor = new DynamicThreadPoolTaskExecutor();
+    public ThreadPoolTaskExecutor printThread() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(2);
         executor.setMaxPoolSize(5);
         executor.setQueueCapacity(10);

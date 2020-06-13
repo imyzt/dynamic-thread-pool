@@ -20,7 +20,7 @@ import static top.imyzt.ctl.common.constants.ServerEndpoint.GET_NEW_CONFIG;
 /**
  * @author imyzt
  * @date 2020/06/07
- * @description 监听器
+ * @description 线程池配置变更监听器
  */
 @Component
 @Slf4j

@@ -17,20 +17,21 @@ public class WorkerThreadPoolConfig {
     /**
      * 采集上报线程池
      */
-    @Bean
+    @Bean("collectionThreadPool")
     public DynamicThreadPoolTaskExecutor collectionThreadPool() {
         DynamicThreadPoolTaskExecutor executor = new DynamicThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(1);
-        executor.setQueueCapacity(16);
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(1024);
         executor.setThreadNamePrefix("thread-pool-collection-");
+        executor.setKeepAliveSeconds(60);
         return executor;
     }
 
     /**
      * 监听服务端线程池配置变化
      */
-    @Bean
+    @Bean("configChangeMonitor")
     public DynamicThreadPoolTaskExecutor configChangeMonitor() {
         DynamicThreadPoolTaskExecutor executor = new DynamicThreadPoolTaskExecutor();
         executor.setCorePoolSize(1);
@@ -43,7 +44,7 @@ public class WorkerThreadPoolConfig {
     /**
      * 修改线程池配置
      */
-    @Bean
+    @Bean("configChange")
     public DynamicThreadPoolTaskExecutor configChange() {
         DynamicThreadPoolTaskExecutor executor = new DynamicThreadPoolTaskExecutor();
         executor.setCorePoolSize(1);

@@ -10,9 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import top.imyzt.ctl.client.config.thread.DynamicThreadPoolConfiguration;
-import top.imyzt.ctl.client.core.executor.DynamicThreadPoolTaskExecutor;
 import top.imyzt.ctl.client.core.queue.ResizeCapacityLinkedBlockingQueue;
 import top.imyzt.ctl.client.listener.event.ThreadPoolConfigChangeEvent;
 import top.imyzt.ctl.client.utils.HttpUtils;
@@ -22,6 +22,7 @@ import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolWorkState;
+import top.imyzt.ctl.common.utils.JsonUtils;
 
 import javax.annotation.Resource;
 import java.net.UnknownHostException;
@@ -38,7 +39,7 @@ import static top.imyzt.ctl.common.constants.ServerEndpoint.WATCH;
 /**
  * @author imyzt
  * @date 2020/05/04
- * @description 线程池配置上报处理类
+ * @description 线程池上报处理器
  */
 @Component
 @Slf4j
@@ -62,9 +63,10 @@ public class ThreadPoolConfigReportHandler {
     /**
      * 定时上报线程池工作状态数据
      */
+    @Async("collectionThreadPool")
     public void timingReport() {
 
-        Map<String, DynamicThreadPoolTaskExecutor> dynamicThreadPoolMap =
+        Map<String, ThreadPoolTaskExecutor> dynamicThreadPoolMap =
                 dynamicThreadPoolConfiguration.getDynamicThreadPoolTaskExecutorMap();
 
         ThreadPoolConfigReportInfo dto = getDynamicThreadPoolReportInfo();
@@ -74,9 +76,11 @@ public class ThreadPoolConfigReportHandler {
         dto.setThreadPoolConfigList(threadPoolWorkStateList);
 
         // 数据上报
-        String currNewVersion = this.sendToServer(dto, ServerEndpoint.WORKER_STATE);
+        this.sendToServer(dto, ServerEndpoint.WORKER_STATE);
 
-        log.info("定时上报任务上报完成, 服务器端返回最新版本={}", currNewVersion);
+        if (log.isDebugEnabled()) {
+            log.debug("定时上报任务上报完成, config={}", JsonUtils.toJsonString(dto));
+        }
     }
 
     /**
@@ -85,7 +89,7 @@ public class ThreadPoolConfigReportHandler {
     @Async("collectionThreadPool")
     public void initialReport() {
 
-        Map<String, DynamicThreadPoolTaskExecutor> dynamicThreadPoolTaskExecutorMap =
+        Map<String, ThreadPoolTaskExecutor> dynamicThreadPoolTaskExecutorMap =
                 dynamicThreadPoolConfiguration.getDynamicThreadPoolTaskExecutorMap();
 
         ArrayList<ThreadPoolBaseInfo> threadPoolConfigList = new ArrayList<>(dynamicThreadPoolTaskExecutorMap.size());
@@ -105,6 +109,28 @@ public class ThreadPoolConfigReportHandler {
         String currNewVersion = this.sendToServer(dto, ServerEndpoint.INIT);
 
         log.info("初始化信息上报完成, 服务器端返回最新版本={}", currNewVersion);
+    }
+
+    /**
+     * 配置改变监听, 如果改变, 修改配置
+     */
+    @Async("configChangeMonitor")
+    public void configChangeMonitor() {
+
+        HashMap<String, String> param = Maps.newHashMap();
+        param.put("appName", appName);
+        HttpResponse response = HttpUtils.sendRestGet(serverUrl + WATCH, param);
+
+        int status = response.getStatus();
+
+        if (HttpStatus.HTTP_NOT_MODIFIED == status) {
+            this.configChangeMonitor();
+        }
+
+        // 交由监听器处理线程改变
+        applicationContext.publishEvent(new ThreadPoolConfigChangeEvent(this, response.body()));
+
+        this.configChangeMonitor();
     }
 
     /**
@@ -144,7 +170,7 @@ public class ThreadPoolConfigReportHandler {
         return dto;
     }
 
-    private List<ThreadPoolBaseInfo> buildThreadPoolWorkStateList(Map<String, DynamicThreadPoolTaskExecutor> dynamicThreadPoolMap) {
+    private List<ThreadPoolBaseInfo> buildThreadPoolWorkStateList(Map<String, ThreadPoolTaskExecutor> dynamicThreadPoolMap) {
 
         List<ThreadPoolBaseInfo> threadPoolWorkStateList = new ArrayList<>();
 
@@ -167,7 +193,9 @@ public class ThreadPoolConfigReportHandler {
             threadPoolConfig.setPoolSize(executor.getPoolSize());
             threadPoolConfig.setQueueSize(threadPoolExecutor.getQueue().size());
 
-            ThreadPoolUtils.threadPoolStatus(threadPoolConfig);
+            if (log.isDebugEnabled()) {
+                ThreadPoolUtils.printThreadPoolStatus(threadPoolConfig);
+            }
 
             threadPoolWorkStateList.add(threadPoolConfig);
         });
@@ -177,7 +205,7 @@ public class ThreadPoolConfigReportHandler {
     /**
      * 构建线程池配置的基础信息
      */
-    private <T extends ThreadPoolBaseInfo> void buildBaseThreadPoolConfig (String tName, DynamicThreadPoolTaskExecutor dynamicExecutor, T dto) {
+    private <T extends ThreadPoolBaseInfo> void buildBaseThreadPoolConfig (String tName, ThreadPoolTaskExecutor dynamicExecutor, T dto) {
 
         // 线程池的基础配置
         dto.setCorePoolSize(dynamicExecutor.getCorePoolSize());
@@ -195,28 +223,6 @@ public class ThreadPoolConfigReportHandler {
             int capacity = ((ResizeCapacityLinkedBlockingQueue) threadPoolExecutor.getQueue()).getCapacity();
             dto.setQueueCapacity(capacity);
         }
-    }
-
-    /**
-     * 配置改变监听, 如果改变, 修改配置
-     */
-    @Async("configChangeMonitor")
-    public void configChangeMonitor() {
-
-        HashMap<String, String> param = Maps.newHashMap();
-        param.put("appName", appName);
-        HttpResponse response = HttpUtils.sendRestGet(serverUrl + WATCH, param);
-
-        int status = response.getStatus();
-
-        if (HttpStatus.HTTP_NOT_MODIFIED == status) {
-            this.configChangeMonitor();
-        }
-
-        // 交由监听器处理线程改变
-        applicationContext.publishEvent(new ThreadPoolConfigChangeEvent(this, response.body()));
-
-        this.configChangeMonitor();
     }
 
 }

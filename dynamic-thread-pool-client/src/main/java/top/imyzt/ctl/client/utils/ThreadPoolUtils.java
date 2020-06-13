@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 /**
  * @author imyzt
  * @date 2020/05/17
- * @description 描述信息
+ * @description 线程池工具类
  */
 @Component
 @Slf4j
@@ -29,32 +29,49 @@ public class ThreadPoolUtils {
         ThreadPoolUtils.applicationContext = applicationContext;
     }
 
-    public static void threadPoolStatus(ThreadPoolWorkState threadPoolConfig) {
+    /**
+     * 答应线程池当前状态
+     */
+    public static void printThreadPoolStatus(ThreadPoolWorkState threadPoolConfig) {
 
-        log.info("{}, 核心线程数={}, " +
+        String taskCompletion = divide(threadPoolConfig.getActiveCount(), threadPoolConfig.getMaximumPoolSize());
+        String queueUsage = divide(threadPoolConfig.getQueueSize(), threadPoolConfig.getQueueSize() + threadPoolConfig.getQueueRemainingCapacity());
+
+        log.debug("{}, 核心线程数={}, " +
                         "活动线程数={}, " +
                         "最大线程数={}, " +
-                        "线程池活跃度={}, " +
-                        "任务完成度={}, " +
                         "队列大小={}, " +
+
+                        "任务完成数={}, " +
+                        "线程池活跃度={}, " +
                         "当前排队线程数={}, " +
                         "队列剩余大小={}, " +
-                        "队列使用度={} ",
+                        "队列使用情况={} ",
                 threadPoolConfig.getPoolName(),
                 threadPoolConfig.getCorePoolSize(),
                 threadPoolConfig.getActiveCount(),
                 threadPoolConfig.getMaximumPoolSize(),
-                threadPoolConfig.getActiveCount() / threadPoolConfig.getMaximumPoolSize(),
-                threadPoolConfig.getCompletedTaskCount(),
                 threadPoolConfig.getQueueSize() + threadPoolConfig.getQueueRemainingCapacity(),
+
+                threadPoolConfig.getCompletedTaskCount(),
+                taskCompletion,
                 threadPoolConfig.getQueueSize(),
                 threadPoolConfig.getQueueRemainingCapacity(),
-                threadPoolConfig.getQueueSize() / (threadPoolConfig.getQueueSize() + threadPoolConfig.getQueueRemainingCapacity()));
+                queueUsage);
+    }
+
+    /**
+     * 除法, 保留两位小数
+     */
+    private static String divide(int num1, int num2) {
+        return String.format("%1.2f%%",  Double.parseDouble(num1 + "")
+                / Double.parseDouble(num2 + "") * 100);
     }
 
 
     /**
      * 调整线程池
+     * @see ThreadPoolBaseInfo#getPoolName() 通过名称修改线程
      * @param newConfig 新配置
      */
     public static void editThreadPoolStatus (ThreadPoolBaseInfo newConfig) {

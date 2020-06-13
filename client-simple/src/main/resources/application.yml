@@ -4,3 +4,6 @@ spring:
     fixed-rate: 2000
   application:
     name: "client-example"
+logging:
+  level:
+    top.imyzt.ctl: debug

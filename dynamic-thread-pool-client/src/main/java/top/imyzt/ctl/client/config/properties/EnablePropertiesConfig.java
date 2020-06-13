@@ -13,5 +13,5 @@ import top.imyzt.ctl.client.properties.DynamicThreadPoolProperties;
 @EnableConfigurationProperties(value = {
         DynamicThreadPoolProperties.class
 })
-public class PropertiesConfig {
+public class EnablePropertiesConfig {
 }

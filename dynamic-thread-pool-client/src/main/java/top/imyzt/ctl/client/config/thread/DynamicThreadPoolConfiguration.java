@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import top.imyzt.ctl.client.core.executor.DynamicThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
@@ -29,13 +29,13 @@ public class DynamicThreadPoolConfiguration {
     /**
      * 当前应用实例所有动态线程池实例
      */
-    private Map<String, DynamicThreadPoolTaskExecutor> dynamicThreadPoolTaskExecutorMap;
+    private Map<String, ThreadPoolTaskExecutor> dynamicThreadPoolTaskExecutorMap;
 
     public DynamicThreadPoolConfiguration(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
-    public Map<String, DynamicThreadPoolTaskExecutor> getDynamicThreadPoolTaskExecutorMap() {
+    public Map<String, ThreadPoolTaskExecutor> getDynamicThreadPoolTaskExecutorMap() {
         return dynamicThreadPoolTaskExecutorMap;
     }
 
@@ -46,8 +46,8 @@ public class DynamicThreadPoolConfiguration {
     public void initialRegistrationThreadPool() {
 
         // 获得所有动态线程池实例
-        Map<String, DynamicThreadPoolTaskExecutor> dynamicThreadPoolMap =
-                applicationContext.getBeansOfType(DynamicThreadPoolTaskExecutor.class);
+        Map<String, ThreadPoolTaskExecutor> dynamicThreadPoolMap =
+                applicationContext.getBeansOfType(ThreadPoolTaskExecutor.class);
 
         log.info("应用配置动态线程池数量, size={}", dynamicThreadPoolMap.size());
 
