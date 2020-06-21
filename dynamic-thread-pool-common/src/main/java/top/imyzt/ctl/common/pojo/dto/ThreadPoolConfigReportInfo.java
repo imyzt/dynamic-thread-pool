@@ -2,15 +2,16 @@ package top.imyzt.ctl.common.pojo.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolWorkState;
 
 /**
  * @author imyzt
  * @date 2020/05/04
- * @description 线程池配置上报基础信息
+ * @description 线程池配置定时上报信息
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ThreadPoolConfigReportInfo extends ThreadPoolConfigReportBaseInfo {
+public class ThreadPoolConfigReportInfo extends ThreadPoolConfigReportBaseInfo<ThreadPoolWorkState> {
 
     /**
      * 应用端口

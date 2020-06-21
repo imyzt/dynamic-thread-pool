@@ -2,20 +2,23 @@ package top.imyzt.ctl.server.service.impl;
 
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.async.DeferredResult;
-import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
 import top.imyzt.ctl.common.utils.JsonUtils;
 import top.imyzt.ctl.server.core.watch.ConfigChangeWatch;
+import top.imyzt.ctl.server.listener.PoolReportListener;
 import top.imyzt.ctl.server.service.ConfigService;
 import top.imyzt.ctl.server.utils.RequestUtils;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author imyzt
@@ -30,6 +33,8 @@ public class ConfigServiceImpl implements ConfigService {
     private ConfigChangeWatch configChangeWatch;
     @Resource
     private MongoTemplate mongoTemplate;
+    @Resource
+    private ApplicationContext applicationContext;
 
     @Override
     public void saveClientConfig(ThreadPoolConfigReportBaseInfo config) {
@@ -39,8 +44,8 @@ public class ConfigServiceImpl implements ConfigService {
 
         String appName = config.getAppName();
 
-        config.getThreadPoolConfigList()
-                .forEach(threadPoolConfig -> this.saveOrUpdateThreadPoolConfig(appName, threadPoolConfig));
+        List<ThreadPoolBaseInfo> threadPoolConfigList = config.getThreadPoolConfigList();
+        threadPoolConfigList.forEach(threadPoolConfig -> this.saveOrUpdateThreadPoolConfig(appName, threadPoolConfig));
 
         log.info("收到初始化上报配置信息, {}", JsonUtils.toJsonString(config));
     }
@@ -85,6 +90,9 @@ public class ConfigServiceImpl implements ConfigService {
         mongoTemplate.save(dto);
 
         log.info("收到采集上报数据, appName={}, {}", dto.getAppName(), top.imyzt.ctl.common.utils.JsonUtils.toJsonString(dto));
+
+        // 放入监听
+        applicationContext.publishEvent(new PoolReportListener.CollectionReportEvent(this, dto));
     }
 
     private void saveOrUpdateThreadPoolConfig(String appName, ThreadPoolBaseInfo threadPoolConfig) {

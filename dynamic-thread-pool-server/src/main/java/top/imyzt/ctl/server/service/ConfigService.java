@@ -1,7 +1,7 @@
 package top.imyzt.ctl.server.service;
 
 import org.springframework.web.context.request.async.DeferredResult;
-import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
 
 /**
