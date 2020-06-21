@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
-import top.imyzt.ctl.common.pojo.dto.ThreadPoolWorkState;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolBaseInfo;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolWorkState;
 import top.imyzt.ctl.common.utils.JsonUtils;
 
 import java.util.Objects;
@@ -30,7 +30,7 @@ public class ThreadPoolUtils {
     }
 
     /**
-     * 答应线程池当前状态
+     * 打印线程池当前状态
      */
     public static void printThreadPoolStatus(ThreadPoolWorkState threadPoolConfig) {
 

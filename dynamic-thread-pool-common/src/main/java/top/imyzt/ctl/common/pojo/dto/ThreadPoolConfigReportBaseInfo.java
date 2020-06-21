@@ -3,6 +3,7 @@ package top.imyzt.ctl.common.pojo.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolBaseInfo;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ThreadPoolConfigReportBaseInfo {
+public class ThreadPoolConfigReportBaseInfo<T extends ThreadPoolBaseInfo> {
 
     /**
      * 应用名称
@@ -26,6 +27,6 @@ public class ThreadPoolConfigReportBaseInfo {
      * 线程池信息
      */
     @NotNull(message = "线程池配置信息不能为空")
-    private List<ThreadPoolBaseInfo> threadPoolConfigList;
+    private List<T> threadPoolConfigList;
 
 }

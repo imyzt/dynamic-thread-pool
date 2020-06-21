@@ -2,7 +2,7 @@ package top.imyzt.ctl.server.web.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolBaseInfo;
 import top.imyzt.ctl.server.service.ConfigService;
 
 import javax.annotation.Resource;

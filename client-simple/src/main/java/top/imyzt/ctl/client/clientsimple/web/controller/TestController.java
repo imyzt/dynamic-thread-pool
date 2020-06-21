@@ -4,7 +4,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.imyzt.ctl.client.utils.ThreadPoolUtils;
-import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolBaseInfo;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;

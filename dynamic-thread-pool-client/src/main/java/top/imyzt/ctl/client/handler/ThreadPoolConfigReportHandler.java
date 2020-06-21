@@ -18,10 +18,10 @@ import top.imyzt.ctl.client.listener.event.ThreadPoolConfigChangeEvent;
 import top.imyzt.ctl.client.utils.HttpUtils;
 import top.imyzt.ctl.client.utils.ThreadPoolUtils;
 import top.imyzt.ctl.common.constants.ServerEndpoint;
-import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportInfo;
-import top.imyzt.ctl.common.pojo.dto.ThreadPoolWorkState;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolWorkState;
 import top.imyzt.ctl.common.utils.JsonUtils;
 
 import javax.annotation.Resource;
@@ -71,7 +71,7 @@ public class ThreadPoolConfigReportHandler {
 
         ThreadPoolConfigReportInfo dto = getDynamicThreadPoolReportInfo();
 
-        List<ThreadPoolBaseInfo> threadPoolWorkStateList = buildThreadPoolWorkStateList(dynamicThreadPoolMap);
+        List<ThreadPoolWorkState> threadPoolWorkStateList = buildThreadPoolWorkStateList(dynamicThreadPoolMap);
 
         dto.setThreadPoolConfigList(threadPoolWorkStateList);
 
@@ -104,7 +104,7 @@ public class ThreadPoolConfigReportHandler {
             threadPoolConfigList.add(threadPoolConfig);
         });
 
-        ThreadPoolConfigReportBaseInfo dto = new ThreadPoolConfigReportBaseInfo(appName, threadPoolConfigList);
+        ThreadPoolConfigReportBaseInfo dto = new ThreadPoolConfigReportBaseInfo<>(appName, threadPoolConfigList);
 
         String currNewVersion = this.sendToServer(dto, ServerEndpoint.INIT);
 
@@ -170,9 +170,9 @@ public class ThreadPoolConfigReportHandler {
         return dto;
     }
 
-    private List<ThreadPoolBaseInfo> buildThreadPoolWorkStateList(Map<String, ThreadPoolTaskExecutor> dynamicThreadPoolMap) {
+    private List<ThreadPoolWorkState> buildThreadPoolWorkStateList(Map<String, ThreadPoolTaskExecutor> dynamicThreadPoolMap) {
 
-        List<ThreadPoolBaseInfo> threadPoolWorkStateList = new ArrayList<>();
+        List<ThreadPoolWorkState> threadPoolWorkStateList = new ArrayList<>();
 
         dynamicThreadPoolMap.forEach((tName, executor) -> {
 

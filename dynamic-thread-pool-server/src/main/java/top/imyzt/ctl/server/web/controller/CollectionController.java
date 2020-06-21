@@ -24,7 +24,7 @@ public class CollectionController {
     private MongoTemplate mongoTemplate;
 
     @PostMapping
-    public String collection (@RequestBody ThreadPoolConfigReportBaseInfo dto) {
+    public String collection(@RequestBody ThreadPoolConfigReportBaseInfo dto) {
 
         log.info("收到采集上报数据, {}", dto.toString());
 

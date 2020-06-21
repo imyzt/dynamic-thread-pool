@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import top.imyzt.ctl.client.listener.event.ThreadPoolConfigChangeEvent;
 import top.imyzt.ctl.client.utils.HttpUtils;
 import top.imyzt.ctl.client.utils.ThreadPoolUtils;
-import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolBaseInfo;
 
 import java.util.HashMap;
 

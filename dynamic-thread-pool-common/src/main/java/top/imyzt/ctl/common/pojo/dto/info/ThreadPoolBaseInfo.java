@@ -1,4 +1,4 @@
-package top.imyzt.ctl.common.pojo.dto;
+package top.imyzt.ctl.common.pojo.dto.info;
 
 import lombok.Data;
 

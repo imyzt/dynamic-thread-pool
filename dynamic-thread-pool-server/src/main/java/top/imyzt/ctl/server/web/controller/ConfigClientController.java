@@ -5,8 +5,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import top.imyzt.ctl.common.constants.ServerEndpoint;
-import top.imyzt.ctl.common.pojo.dto.ThreadPoolBaseInfo;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolBaseInfo;
 import top.imyzt.ctl.common.pojo.dto.ThreadPoolConfigReportBaseInfo;
+import top.imyzt.ctl.common.pojo.dto.info.ThreadPoolWorkState;
 import top.imyzt.ctl.server.service.ConfigService;
 
 import javax.annotation.Resource;
@@ -41,7 +42,7 @@ public class ConfigClientController {
      * 采集定时上报线程池的工作状态信息
      */
     @RequestMapping(method = RequestMethod.POST, value = ServerEndpoint.WORKER_STATE)
-    public void workerState (@RequestBody ThreadPoolConfigReportBaseInfo dto) {
+    public void workerState (@RequestBody ThreadPoolConfigReportBaseInfo<ThreadPoolWorkState> dto) {
 
         configService.saveThreadPoolWorkerState(dto);
     }
