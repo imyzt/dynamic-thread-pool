@@ -31,7 +31,7 @@ public class PoolReportListener {
 
         List<ThreadPoolWorkState> threadPoolConfigList = baseInfo.getThreadPoolConfigList();
 
-        // 遍历每一个线程池, 确定是否有配置报警后自动扩容策略
+        // 遍历每一个线程池, 确定是否有配置报警. 自动扩容策略
         for (ThreadPoolBaseInfo threadPoolBaseInfo : threadPoolConfigList) {
 
             String poolName = threadPoolBaseInfo.getPoolName();

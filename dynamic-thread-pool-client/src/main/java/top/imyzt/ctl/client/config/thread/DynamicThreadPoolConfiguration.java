@@ -1,11 +1,14 @@
 package top.imyzt.ctl.client.config.thread;
 
+import cn.hutool.core.collection.CollUtil;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import top.imyzt.ctl.client.common.DynamicThreadPool;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
@@ -49,9 +52,28 @@ public class DynamicThreadPoolConfiguration {
         Map<String, ThreadPoolTaskExecutor> dynamicThreadPoolMap =
                 applicationContext.getBeansOfType(ThreadPoolTaskExecutor.class);
 
-        log.info("应用配置动态线程池数量, size={}", dynamicThreadPoolMap.size());
+        if (CollUtil.isEmpty(dynamicThreadPoolMap)) {
+            log.warn("系统未配置动态线程池");
+            return;
+        }
 
-        this.dynamicThreadPoolTaskExecutorMap = dynamicThreadPoolMap;
+        Map<String, Object> dynamicThreadPoolConfigBeans = applicationContext
+                .getBeansWithAnnotation(DynamicThreadPool.class);
+
+        if (CollUtil.isEmpty(dynamicThreadPoolConfigBeans)) {
+            this.dynamicThreadPoolTaskExecutorMap = dynamicThreadPoolMap;
+            log.warn("系统未查询到配置并开启动态处理的线程池");
+            return;
+        }
+
+        this.dynamicThreadPoolTaskExecutorMap = Maps.newHashMap();
+        dynamicThreadPoolMap.forEach((beanName, bean) -> {
+            if (dynamicThreadPoolConfigBeans.containsKey(beanName)) {
+                this.dynamicThreadPoolTaskExecutorMap.put(beanName, bean);
+            }
+        } );
+
+        log.info("应用配置动态线程池数量, size={}", dynamicThreadPoolMap.size());
     }
 
 }

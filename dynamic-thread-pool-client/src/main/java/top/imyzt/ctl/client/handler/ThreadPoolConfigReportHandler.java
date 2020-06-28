@@ -205,7 +205,7 @@ public class ThreadPoolConfigReportHandler {
     /**
      * 构建线程池配置的基础信息
      */
-    private <T extends ThreadPoolBaseInfo> void buildBaseThreadPoolConfig (String tName, ThreadPoolTaskExecutor dynamicExecutor, T dto) {
+    private <T extends ThreadPoolBaseInfo> void buildBaseThreadPoolConfig(String tName, ThreadPoolTaskExecutor dynamicExecutor, T dto) {
 
         // 线程池的基础配置
         dto.setCorePoolSize(dynamicExecutor.getCorePoolSize());
