@@ -13,9 +13,14 @@ public class AlarmRule {
     private Integer id;
 
     /**
+     * 应用名称
+     */
+    private String appName;
+
+    /**
      * 线程池名称
      */
-    private String threadPoolName;
+    private String poolName;
 
     /**
      * 线程池活跃度
