@@ -3,7 +3,9 @@ package top.imyzt.ctl.server.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -11,6 +13,7 @@ import java.util.Optional;
  * @date 2020/05/24
  * @description json 工具类
  */
+@Component
 public class JsonUtils {
 
     private static ObjectMapper objectMapper;
@@ -21,6 +24,9 @@ public class JsonUtils {
     }
 
     public static String toJson(Object value) {
+        if (Objects.isNull(value)) {
+            return "null";
+        }
         try {
             return objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {

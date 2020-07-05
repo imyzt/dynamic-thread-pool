@@ -1,0 +1,12 @@
+server:
+  port: 9876
+spring:
+  mvc:
+    async:
+      request-timeout: 60000
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_HOST:dynamic_thread_pool_ctl}?useUnicode=true&characterEncoding=utf8&useSSL=false&&serverTimezone=Asia/Shanghai&autoReconnect=true
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:12345678}
+

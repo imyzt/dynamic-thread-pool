@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.imyzt.ctl.server.dao.mapper.AlarmRuleMapper">
+
+    <resultMap id="alarmMap" type="top.imyzt.ctl.server.pojo.dto.AlarmExpansionRuleDTO">
+        <id property="id" column="aid"/>
+        <result property="ruleName" column="rule_name"/>
+        <result property="taskCompletion" column="task_completion"/>
+        <result property="queueUsage" column="queue_usage"/>
+        <result property="content" column="content"/>
+        <association property="expansionRule" javaType="top.imyzt.ctl.server.pojo.dto.ExpansionRuleDTO">
+            <id property="id" column="eid"/>
+            <result property="coreSize" column="core_size"/>
+            <result property="maxSize" column="max_size"/>
+            <result property="queueSize" column="queue_size"/>
+        </association>
+    </resultMap>
+
+    <select id="getRuleList" resultMap="alarmMap">
+        SELECT
+            ar.id aid, ar.rule_name, ar.task_completion, ar.queue_usage, ar.content, er.id eid, er.core_size, er.max_size, er.queue_size
+        FROM alarm_rule ar
+        LEFT JOIN expansion_rule er ON ar.id = er.alarm_rule_id
+        WHERE ar.app_name = #{appName} AND ar.pool_name = #{poolName}
+    </select>
+</mapper>

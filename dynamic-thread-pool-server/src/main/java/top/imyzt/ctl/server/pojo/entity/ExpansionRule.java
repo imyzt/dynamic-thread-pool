@@ -1,21 +1,40 @@
 package top.imyzt.ctl.server.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import java.io.Serializable;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 /**
+ * <p>
+ * 扩容规则
+ * </p>
+ *
  * @author imyzt
- * @date 2020/06/28
- * @description 扩容规则
+ * @date 2020-07-05
  */
 @Data
-public class ExpansionRule {
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@TableName("expansion_rule")
+public class ExpansionRule implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * id
+     */
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
      * 绑定一个报警规则
-     * 达到报警规则, 则自动扩容
-     * 发报警通知, 然后扩容成功发扩容通知
      */
     private Integer alarmRuleId;
 
@@ -33,4 +52,17 @@ public class ExpansionRule {
      * 扩容后队列大小
      */
     private Integer queueSize;
+
+    /**
+     * 逻辑删除
+     */
+    private Boolean delFlag;
+
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
+
+
 }
